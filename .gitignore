@@ -73,3 +73,4 @@ gradlew
 gradlew.bat
 .vertx/
 logs/
+ignores/
