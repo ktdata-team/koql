@@ -15,7 +15,6 @@ pluginManagement {
 
     plugins {
         val kotlinVersion:String by settings
-        val springBootVersion: String by settings
         id( "org.jetbrains.kotlin.jvm")  version kotlinVersion
         id ("org.jetbrains.kotlin.plugin.noarg")  version kotlinVersion
         id ("org.jetbrains.kotlin.plugin.allopen")  version kotlinVersion
@@ -30,5 +29,4 @@ pluginManagement {
 
 rootProject.name = "koql"
 include ("koql-dsl")
-
-
+include("koql-core")

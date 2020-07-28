@@ -282,8 +282,8 @@ class AsteriskField : SelectExpr {
 
 }
 
-open class AliasColumn<T>(val column: Column<T>, val alias: String) :
-    Column<T>(column.name, column.table, column.parent) {
+open class AliasColumn<T>(val column: Column<T>, override var alias: String?) :
+    Column<T>(column.name, column.table, alias ,column.parent) {
     override fun render(
         configuration: Configuration,
         contextConfiguration: ContextConfiguration
@@ -365,7 +365,7 @@ open class Column<T>(
 
 }
 
-class AliasValueField<T>(val valueField: ValueField<T>, override var alias: String?) : ValueField<T>(valueField.value) {
+class AliasValueField<T>(val valueField: ValueField<T>, override var alias: String?) : ValueField<T>(valueField.value , alias) {
     override fun render(
         configuration: Configuration,
         contextConfiguration: ContextConfiguration
@@ -393,7 +393,7 @@ class AliasValueField<T>(val valueField: ValueField<T>, override var alias: Stri
 }
 
 open class ValueField<T>(
-    val value: T, override var alias: String?
+    val value: T, override var alias: String? = null
 
 ) : Field<T>() {
 
@@ -418,7 +418,7 @@ open class ValueField<T>(
     }
 }
 
-class AliasCalculateField<T>(val calculateField: CalculateField<T>, val alias: String) :
+class AliasCalculateField<T>(val calculateField: CalculateField<T>, override var alias: String?) :
     CalculateField<T>(calculateField.field1, calculateField.field2, calculateField.op) {
     override fun render(
         configuration: Configuration,

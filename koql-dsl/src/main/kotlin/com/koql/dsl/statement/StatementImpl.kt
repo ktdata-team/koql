@@ -20,11 +20,11 @@ open class Select(
     SelectFinalI,
     SelectWherePhaseI,
     SelectPhaseI,
-    Statement<Select> {
-    private val selectFields = mutableListOf<SelectExpr<*>>()
-    fun selectFields(): MutableList<SelectExpr<*>> = selectFields
-    private val fromTables = mutableListOf<Table<*>>()
-    fun fromTables(): MutableList<Table<*>> = fromTables
+    Statement {
+    private val selectFields = mutableListOf<SelectExpr>()
+    fun selectFields(): MutableList<SelectExpr> = selectFields
+    private val fromTables = mutableListOf<Table>()
+    fun fromTables(): MutableList<Table> = fromTables
     private var whereCondition: Condition? = null
     fun whereCondition() = whereCondition
     private val preparedValues = mutableListOf<Any?>()
@@ -35,16 +35,16 @@ open class Select(
     }
 
 
-    fun addSelectField(vararg fields: SelectExpr<*>) {
+    fun addSelectField(vararg fields: SelectExpr) {
         selectFields.addAll(fields)
     }
 
-    fun addFromTable(vararg tables: Table<*>) {
+    fun addFromTable(vararg tables: Table) {
         fromTables.addAll(tables)
     }
 
 
-    override fun from(vararg tables: Table<*>): SelectWherePhaseI {
+    override fun from(vararg tables: Table): SelectWherePhaseI {
         addFromTable(*tables)
         return this
     }

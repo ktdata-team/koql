@@ -1,5 +1,5 @@
+import com.koql.dsl.KOQL
 import com.koql.dsl.config.Configuration
-import io.github.shinglem.koql.KOQL
 import com.koql.dsl.dialect.DefautSql
 import com.koql.dsl.schema.Column
 import com.koql.dsl.schema.Schema
@@ -98,7 +98,7 @@ class Test {
         )
 
         context.select()
-            .from(TestTable)
+            .from(TestTable.TestTable)
             .getSql()
             .run {
                 println(this)
@@ -108,10 +108,10 @@ class Test {
 //        val sub = context.select().from(ZtServiceConfig).where(id.eq(1)).asSubSelect("a")
 
         context
-            .select(orderCatagory.`as`("ooo"))
-            .from(ZtServiceConfig.`as`("aaa") )
+            .select(ZtServiceConfig.ZtServiceConfig.orderCatagory.`as`("ooo"))
+            .from(ZtServiceConfig.ZtServiceConfig.`as`("aaa") )
             .where(
-                id.eq(2)
+                ZtServiceConfig.ZtServiceConfig.id.eq(2)
 //                    .and(sub.field(0).eq(3))
 //                .and(Column<String>("test2").eq(Column<String>("test")))
 //                .or(Column<Int>("test3").between(1).and(2))
