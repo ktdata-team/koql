@@ -1,52 +1,75 @@
 package com.koql.core.statement.const
 
-class Comparator(val value : String)
+enum class Comparator(val value : String){
 
 
-val IN = Comparator("in")
+     IN ("IN"),
 
 
-val NOT_IN= Comparator("not in")
+     NOT_IN("NOT IN"),
 
 
-val EQUALS= Comparator("=")
+     EQUALS("="),
 
 
-val NOT_EQUALS= Comparator("<>")
+     NOT_EQUALS("<>"),
 
 
-val LESS= Comparator("<")
+     LESS("<"),
 
 
-val LESS_OR_EQUAL= Comparator("<=")
+     LESS_OR_EQUAL("<="),
 
 
-val GREATER= Comparator(">")
+     GREATER(">"),
 
 
-val GREATER_OR_EQUAL= Comparator(">=")
+     GREATER_OR_EQUAL(">="),
 
 
-val LIKE= Comparator("like")
+     LIKE("LIKE"),
 
 
-val NOT_LIKE= Comparator("not like")
+     NOT_LIKE("NOT LIKE");
 
 
-
-
-class BetweenOperator(val value: String)
-
-val BETWEEN = BetweenOperator("between")
-
-val BETWEEN_AND =  BetweenOperator("and")
+    override fun toString() :String{
+        return value
+    }
+}
 
 
 
-class AsOperator(val value: String)
-
-val AS = AsOperator("as")
 
 
+enum class BetweenOperator(val value: String){
+    BETWEEN("between"),
 
-class CalculateOperator(val value: String)
+    BETWEEN_AND("and");
+
+    override fun toString() :String{
+        return value
+    }
+}
+
+
+
+
+
+enum class AsOperator(val value: String){
+    AS("as");
+
+    override fun toString() :String{
+        return value
+    }
+}
+
+
+
+
+enum class CalculateOperator(val value: String){
+    ;
+    override fun toString() :String{
+        return value
+    }
+}

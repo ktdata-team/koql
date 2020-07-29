@@ -6,4 +6,11 @@ open class Sql {
     var prepared  = false
 
 
+    override fun toString() : String {
+        return """sql : $sqlStr  
+            |params : $params
+            |prepared : $prepared
+        """.trimMargin()
+    }
+
 }

@@ -1,9 +1,13 @@
 package com.koql.core.statement.structure
 
 import com.koql.core.Sql
+import com.koql.core.condition.CompareCondition
+import com.koql.core.condition.Condition
 import com.koql.core.config.Configuration
+import com.koql.core.statement.const.CalculateOperator
+import com.koql.core.statement.const.Comparator.*
 
-abstract class Expression<T> {
+abstract class Expression {
     private val _hashCode: Int by lazy { toString().hashCode() }
 
 //    /** Appends the SQL representation of this expression to the specified [queryBuilder]. */
@@ -11,7 +15,7 @@ abstract class Expression<T> {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Expression<*>) return false
+        if (other !is Expression) return false
 
         if (toString() != other.toString()) return false
 
@@ -26,11 +30,160 @@ abstract class Expression<T> {
 
 }
 
-abstract class SelectExpr<T> :  Expression<T>() {
+abstract class SelectExpr<T> :  Expression() {
+
+//    open var name: String = ""
+
+    fun eq(value: T): Condition {
+        return CompareCondition(this, value, EQUALS)
+    }
+
+
+    fun ne(value: T): Condition {
+        return CompareCondition(this, value, NOT_EQUALS)
+    }
+
+    fun ls(value: T): Condition {
+        return CompareCondition(this, value, LESS)
+    }
+
+    fun le(value: T): Condition {
+        return CompareCondition(this, value, LESS_OR_EQUAL)
+    }
+
+    fun gt(value: T): Condition {
+        return CompareCondition(this, value, GREATER)
+    }
+
+    fun ge(value: T): Condition {
+        return CompareCondition(this, value, GREATER_OR_EQUAL)
+    }
+
+    fun `in`(value: T): Condition {
+        return CompareCondition(this, value, IN)
+    }
+
+    fun notIn(value: T): Condition {
+        return CompareCondition(this, value, NOT_IN)
+    }
+
+    fun like(value: T): Condition {
+        return CompareCondition(this, value, LIKE)
+    }
+
+    fun notLike(value: T): Condition {
+        return CompareCondition(this, value, NOT_LIKE)
+    }
+
+
+    fun eq(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, EQUALS)
+    }
+
+
+    fun ne(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, NOT_EQUALS)
+    }
+
+    fun ls(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, LESS)
+    }
+
+    fun le(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, LESS_OR_EQUAL)
+    }
+
+    fun gt(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, GREATER)
+    }
+
+    fun ge(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, GREATER_OR_EQUAL)
+    }
+
+    fun `in`(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, IN)
+    }
+
+    fun notIn(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, NOT_IN)
+    }
+
+    fun like(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, LIKE)
+    }
+
+    fun notLike(value: SelectExpr<T>): Condition {
+        return CompareCondition(this, value, NOT_LIKE)
+    }
+
+
+//    fun between(value: T): BetweenCondition<T> {
+//        return BetweenCondition(this, value)
+//    }
+//
+//    fun between(value: Field<T>): BetweenCondition<T> {
+//        return BetweenCondition(this, value)
+//    }
+
 
 }
 
 
+
+class AsteriskField : SelectExpr<Unit>() {
+    val asterisk = "*"
+
+    override fun render(
+        configuration: Configuration
+    ): Sql {
+
+        return Sql().apply { sqlStr = "*" }
+    }
+
+
+}
+
+
+open class ValueField<T>(
+    val value: T
+
+) : SelectExpr<T>() {
+
+
+    override fun render(
+        configuration: Configuration
+    ): Sql {
+        return Sql().apply {
+            sqlStr = configuration.valueSeparationCharacter + value.toString() + configuration.valueSeparationCharacter
+        }
+    }
+
+
+
+
+}
+
+open class CalculateField<T>(val field1: SelectExpr<T>, val field2: SelectExpr<T>, val op: CalculateOperator) :
+    SelectExpr<T>() {
+
+    override fun render(
+        configuration: Configuration
+    ): Sql {
+        val f1 = field1.render(configuration)
+        val f2 = field2.render(configuration)
+
+
+
+        return Sql().apply {
+            sqlStr = f1.sqlStr+ " " + op.value + " " + f2.sqlStr
+
+        }
+
+    }
+
+
+}
 
 
 //

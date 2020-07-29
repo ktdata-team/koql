@@ -12,14 +12,14 @@ class DefautSql(var configuration: Configuration = Configuration()) :
     SqlDialect {
 
 
-    fun <T> select(vararg fields: SelectExpr<T>): SelectImpl {
+    fun  select(vararg fields: SelectExpr<*>): SelectImpl {
         val select = SelectImpl(configuration)
             .apply { selectExprs.addAll(fields) }
 
         return select
     }
 
-    fun <T> selectDistinct(vararg fields: SelectExpr<T>): SelectImpl {
+    fun  selectDistinct(vararg fields: SelectExpr<*>): SelectImpl {
         val select = SelectImpl(configuration)
             .apply {
                 selectExprs.addAll(fields)

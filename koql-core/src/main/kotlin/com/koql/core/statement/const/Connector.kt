@@ -1,26 +1,32 @@
 package com.koql.core.statement.const
 
-class ConditionConnector(val value : String)
+enum class ConditionConnector(val value: String) {
+    emptyConnector(""),
 
-val emptyConnector = ConditionConnector("")
+    AND("and"),
 
-val AND = ConditionConnector("and")
+    OR("or"),
 
-val OR = ConditionConnector("or")
+    NOT("not"),
 
-val NOT = ConditionConnector("not")
+    AND_NOT("and not"),
 
-val AND_NOT = ConditionConnector("and not")
+    OR_NOT("or not"),
 
-val OR_NOT = ConditionConnector("or not")
+    AND_EXISTS("and exists"),
 
-val AND_EXISTS = ConditionConnector("and exists")
+    OR_EXISTS("or exists"),
 
-val OR_EXISTS = ConditionConnector("or exists")
+    AND_NOT_EXISTS("and not exists"),
 
-val AND_NOT_EXISTS = ConditionConnector("and not exists")
+    OR_NOT_EXISTS("or not exists");
 
-val OR_NOT_EXISTS = ConditionConnector("or not exists")
+    override fun toString(): String {
+        return value
+    }
+}
+
+
 
 
 

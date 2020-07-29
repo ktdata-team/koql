@@ -29,19 +29,20 @@ class Column<T>(
 
     override fun hashCode(): Int = table.hashCode() * 31 + name.hashCode()
 
-    override fun toString(): String = "${table.javaClass.name}.$name"
 
 
     override fun render(configuration: Configuration): Sql {
 
-        val
-
-        val str = ""
+        var str = configuration.fieldSeparationCharacter + name + configuration.fieldSeparationCharacter
 
 
-        val sql = Sql(
+        if(configuration.renderParent) {
+            str = (table?.render(configuration)?.sqlStr?.let { "$it." }  ?: "" )+ str
+        }
 
-        )
-        TODO("Not yet implemented")
+        val sql = Sql().apply {
+            sqlStr = str
+        }
+        return sql
     }
 }
