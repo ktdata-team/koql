@@ -1,32 +1,49 @@
 package com.koql.core.dialect
 
-import com.koql.core.statement.const.Disdinct
-import com.koql.core.statement.dql.SelectImpl
-import com.koql.core.statement.structure.SelectExpr
 import com.koql.core.config.Configuration
+import com.koql.core.statement.common.Asterisk
+import com.koql.core.statement.common.Renderable
+import com.koql.core.statement.dql.Select
+import com.koql.core.statement.structure.Field
 
-interface SqlDialect
+interface SqlDialect {
+    fun setConfig(config: Configuration)
+    fun getConfig(): Configuration
+}
 
 
-class DefautSql(var configuration: Configuration = Configuration()) :
+class DefautSql() :
     SqlDialect {
 
+    var configuration: Configuration = Configuration()
 
-    fun  select(vararg fields: SelectExpr<*>): SelectImpl {
-        val select = SelectImpl(configuration)
-            .apply { selectExprs.addAll(fields) }
+    constructor(config: Configuration) : this(){
+        configuration = config
+    }
 
+    override fun getConfig(): Configuration {
+        return configuration
+    }
+
+    override fun setConfig(config: Configuration) {
+        configuration = config
+    }
+
+    fun select(vararg fields : Field<*>) : Select {
+        val select = Select(fields.toMutableList() , config = configuration)
         return select
     }
 
-    fun  selectDistinct(vararg fields: SelectExpr<*>): SelectImpl {
-        val select = SelectImpl(configuration)
-            .apply {
-                selectExprs.addAll(fields)
-                distinct = Disdinct.DISTINCT
-            }
-
+    fun selectDisdinct(vararg fields : Field<*>) : Select {
+        val select = Select(fields.toMutableList() , true , configuration)
         return select
     }
+
+    fun selectAll() : Select {
+        val select = Select(mutableListOf(Asterisk.Asterisk) , config = configuration)
+        return select
+    }
+
+
 }
 

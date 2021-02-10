@@ -1,48 +1,30 @@
 package com.koql.core.statement.structure
 
-import com.koql.core.Sql
 import com.koql.core.config.Configuration
 
-class Column<T>(
-    /** Table where the columns is declared. */
-    val table: Table,
-    /** Name of the column. */
-    val name: String
-
-) : SelectExpr<T>() {
+open class Column<T> (val name : String,
+                      val schema :Schema,
+                      val table: Table
+) : Field<T>() {
 
 
 
 
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Column<*>) return false
-        if (!super.equals(other)) return false
 
-        if (table != other.table) return false
-        if (name != other.name) return false
+    override fun render(config: Configuration): String {
 
-
-        return true
-    }
-
-    override fun hashCode(): Int = table.hashCode() * 31 + name.hashCode()
-
-
-
-    override fun render(configuration: Configuration): Sql {
-
-        var str = configuration.fieldSeparationCharacter + name + configuration.fieldSeparationCharacter
-
-
-        if(configuration.renderParent) {
-            str = (table?.render(configuration)?.sqlStr?.let { "$it." }  ?: "" )+ str
+        if(config.renderParent){
+            return "${schema.render(config)}.${table.render(config)}.${config.fieldSeparationCharacter}$name${config.fieldSeparationCharacter}"
         }
 
-        val sql = Sql().apply {
-            sqlStr = str
-        }
-        return sql
+
+        return "${config.fieldSeparationCharacter}$name${config.fieldSeparationCharacter}"
     }
+
+    override fun parameters(): MutableMap<String, Any?> {
+        return mutableMapOf()
+    }
+
+
 }

@@ -1,13 +1,6 @@
-package com.koql.dsl.const
+package com.koql.core.statement.condition
 
-class Comparator(val value : String)
-
-
-val IN = Comparator("in")
-
-
-val NOT_IN= Comparator("not in")
-
+open class Comparator(val value : String)
 
 val EQUALS= Comparator("=")
 
@@ -27,10 +20,23 @@ val GREATER= Comparator(">")
 val GREATER_OR_EQUAL= Comparator(">=")
 
 
-val LIKE= Comparator("like")
 
 
-val NOT_LIKE= Comparator("not like")
+sealed class InComparator(value : String) : Comparator(value)
+
+object IN : InComparator("IN")
+
+object NOT_IN: InComparator("NOT IN")
+
+
+
+
+
+sealed class LikeComparator(value : String) : Comparator(value)
+
+object LIKE : LikeComparator("LIKE")
+
+object NOT_LIKE :  LikeComparator("NOT LIKE")
 
 
 
@@ -40,6 +46,8 @@ class BetweenOperator(val value: String)
 val BETWEEN = BetweenOperator("between")
 
 val BETWEEN_AND =  BetweenOperator("and")
+
+
 
 
 

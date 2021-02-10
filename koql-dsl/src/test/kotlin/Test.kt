@@ -5,6 +5,7 @@ import com.koql.dsl.schema.Column
 import com.koql.dsl.schema.Schema
 import com.koql.dsl.schema.Table
 import org.junit.Test
+import java.util.HashMap
 
 class Test {
 
@@ -103,6 +104,7 @@ class Test {
             .run {
                 println(this)
             }
+
 
 
 //        val sub = context.select().from(ZtServiceConfig).where(id.eq(1)).asSubSelect("a")
