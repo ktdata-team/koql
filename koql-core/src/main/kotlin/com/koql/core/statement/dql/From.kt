@@ -36,7 +36,7 @@ open class From (
         return join
     }
 
-    open fun rigthJoin(table: Table): Join {
+    open fun rightJoin(table: Table): Join {
         val join = Join(this , table , RIGHT_JOIN, config)
         return join
     }
