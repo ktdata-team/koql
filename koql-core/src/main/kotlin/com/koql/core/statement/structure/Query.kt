@@ -7,7 +7,10 @@ import com.koql.core.statement.dql.OrderBy
 import com.koql.core.statement.dql.Union
 import com.koql.core.statement.dql.UnionMode
 
-abstract class Query(val config : Configuration) : StatementPart {
+abstract class SqlStatement(val config : Configuration) : StatementPart
+
+
+abstract class Query(config : Configuration) : SqlStatement(config) {
 
     open fun union(query: Query): Union {
         val union = Union(this , query , config = config)
