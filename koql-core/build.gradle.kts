@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.koql"
-version = "1.0-SNAPSHOT"
+version = rootProject.version
 
 repositories {
     // Use jcenter for resolving dependencies.

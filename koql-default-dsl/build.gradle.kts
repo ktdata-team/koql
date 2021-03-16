@@ -4,6 +4,7 @@
  * This generated file contains a sample Kotlin application project to get you started.
  */
 
+
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     java
@@ -11,9 +12,17 @@ plugins {
 }
 
 group = "com.koql"
-version = "0.1-SNAPSHOT"
+version = rootProject.version
+
+repositories {
+    // Use jcenter for resolving dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
 
 dependencies {
+
+    api(project(":koql-core"))
 
 
     // Align versions of all Kotlin components
@@ -29,18 +38,20 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
+tasks {
 
-
-
-allprojects {
-    repositories {
-        mavenLocal()
-        maven("http://maven.aliyun.com/nexus/content/groups/public/")
-        maven("https://dl.bintray.com/kotlin/exposed")
-        maven("https://jitpack.io")
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
-        maven("https://clojars.org/repo/")
-        jcenter()
-        mavenCentral()
+    compileJava {
+        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
     }
+    compileTestJava {
+        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+    }
+    compileKotlin {
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+
 }

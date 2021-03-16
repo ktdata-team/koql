@@ -1,10 +1,8 @@
 package com.koql.core.statement.structure
 
-import com.koql.core.statement.common.Renderable
 import com.koql.core.statement.common.StatementPart
-import com.koql.core.statement.condition.CompareCondition
-import com.koql.core.statement.condition.Condition
-import com.koql.core.statement.condition.*
+import com.koql.core.condition.CompareCondition
+import com.koql.core.condition.*
 
 abstract class Field<T> : StatementPart {
 

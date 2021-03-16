@@ -27,5 +27,5 @@ pluginManagement {
 
 
 rootProject.name = "koql"
-include ("koql-dsl")
 include("koql-core")
+include("koql-default-dsl")
