@@ -2,7 +2,7 @@ package com.koql.core.dsl.base.dql
 
 import com.koql.core.config.Configuration
 import com.koql.core.statement.common.StatementPart
-import com.koql.core.statement.structure.Query
+import com.koql.core.dsl.base.structure.Query
 
 enum class UnionMode{
     UNION , UNION_ALL

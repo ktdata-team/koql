@@ -1,6 +1,7 @@
 package com.koql.core.statement.structure
 
-import com.koql.core.config.Configuration
+
+import com.koql.core.dsl.mysql.config.Configuration
 import com.koql.core.statement.common.StatementPart
 
 

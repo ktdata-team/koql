@@ -1,6 +1,8 @@
 package com.koql.core.statement.structure
 
-import com.koql.core.config.Configuration
+
+import com.koql.core.dsl.mysql.config.Configuration
+import com.koql.core.dsl.mysql.config.RenderConfig
 import java.util.*
 
 open class ValueField<T>(val name: String, val value: T) : Field<T>() {
@@ -18,7 +20,7 @@ open class ValueField<T>(val name: String, val value: T) : Field<T>() {
     }
 
 
-    override fun render(config: Configuration): String {
+    override fun render(config: Configuration , renderConfig: RenderConfig): String {
         val sql = "#{$name}"
         return sql
     }

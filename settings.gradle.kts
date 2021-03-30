@@ -29,3 +29,4 @@ pluginManagement {
 rootProject.name = "koql"
 include("koql-core")
 include("koql-default-dsl")
+include("koql-mysql-dsl")

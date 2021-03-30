@@ -1,15 +1,15 @@
-package com.koql.core.dsl.base.dql
+package com.koql.core.dsl.mysql.dql
 
 import com.koql.core.config.Configuration
 import com.koql.core.statement.common.StatementPart
 import com.koql.core.condition.Condition
-import com.koql.core.dsl.base.structure.Query
+import com.koql.core.dsl.mysql.structure.QueryBase
 
 class Where(
     protected val prefixPart: StatementPart,
     protected val condition: Condition,
      config: Configuration
-) : Query(config) {
+) : QueryBase(config) {
 
     companion object {
         @JvmStatic

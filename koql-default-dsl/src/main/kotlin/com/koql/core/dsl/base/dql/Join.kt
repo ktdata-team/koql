@@ -4,7 +4,7 @@ import com.koql.core.config.Configuration
 import com.koql.core.statement.common.Renderable
 import com.koql.core.statement.common.StatementPart
 import com.koql.core.condition.Condition
-import com.koql.core.statement.structure.Query
+import com.koql.core.dsl.base.structure.Query
 
 const val ON = "ON"
 

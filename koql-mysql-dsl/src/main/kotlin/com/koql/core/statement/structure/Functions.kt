@@ -1,6 +1,8 @@
 package com.koql.core.statement.structure
 
-import com.koql.core.config.Configuration
+
+import com.koql.core.dsl.mysql.config.Configuration
+import com.koql.core.dsl.mysql.config.RenderConfig
 import com.koql.core.statement.common.Asterisk
 import com.koql.core.statement.common.StatementPart
 
@@ -20,8 +22,8 @@ open class Count(
 
     }
 
-    override fun render(config: Configuration): String {
-        return "$COUNT(${field.render(config)})"
+    override fun render(config: Configuration , renderConfig: RenderConfig): String {
+        return "$COUNT(${field.render(config , renderConfig)})"
     }
 
     override fun parameters(): MutableMap<String, Any?> {
