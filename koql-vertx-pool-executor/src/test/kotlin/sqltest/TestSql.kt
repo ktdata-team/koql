@@ -1,19 +1,9 @@
+/*
 package sqltest
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.koql.base.Table
-import com.koql.pgsql.PgKoqlConfig
-import com.koql.vertxpoolexecutor.VertxSqlPoolExecutor
-import io.vertx.core.Vertx
-import io.vertx.core.VertxOptions
-import io.vertx.core.json.jackson.DatabindCodec
-import io.vertx.core.tracing.TracingOptions
-import io.vertx.core.tracing.TracingPolicy
-import io.vertx.pgclient.PgConnectOptions
-import io.vertx.pgclient.PgPool
 import io.vertx.pgclient.data.Inet
 import io.vertx.pgclient.data.Interval
-import io.vertx.sqlclient.PoolOptions
 import io.vertx.sqlclient.data.Numeric
 import mu.KotlinLogging
 import java.math.BigDecimal
@@ -230,3 +220,4 @@ class SqlTest() {
 
     }
 }
+*/

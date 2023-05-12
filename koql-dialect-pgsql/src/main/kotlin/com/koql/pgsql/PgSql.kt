@@ -1,7 +1,6 @@
 package com.koql.pgsql
 
 import com.koql.base.*
-import io.vertx.core.json.jackson.DatabindCodec
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -117,7 +116,7 @@ open class PgKoqlConfig internal constructor(configs: Map<String, Any?>) : KoqlC
     constructor(
         refSymbol: String = "\"",
         executor: Executor? = null,
-        resultMapper: ResultMapper = JacksonResultMapper(DatabindCodec.mapper())
+        resultMapper: ResultMapper? = null
     ) : this(
         mapOf(
             "refSymbol" to refSymbol,

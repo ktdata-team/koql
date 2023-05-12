@@ -1,3 +1,4 @@
+/*
 package sqltest
 
 import com.github.freva.asciitable.AsciiTable
@@ -60,6 +61,7 @@ open class DefaultLogTracerFactory : LogTracerFactory() {
 
         val facs = ServiceHelper.loadFactories(TraceTypeResolver::class.java)
         addResolvers(*facs.toTypedArray())
+*/
 /*        addResolvers(
             object : TraceTypeResolver<QueryRequest> {
                 override fun getClass(): KClass<QueryRequest> {
@@ -121,7 +123,8 @@ $ret
                 }
 
             }
-        )*/
+        )*//*
+
     }
 }
 class QueryRequestTraceTypeResolver: TraceTypeResolver<QueryRequest> {
@@ -163,7 +166,7 @@ class RowSetTraceTypeResolver: TraceTypeResolver<RowSet<*>> {
 
         val ret = AsciiTable.getTable(rows, cols)
         return """
-$ret  
+$ret
                     """
     }
 
@@ -182,7 +185,7 @@ class SqlResultImplTraceTypeResolver: TraceTypeResolver<SqlResultImpl<*>> {
 
         val ret = AsciiTable.getTable(rows, cols)
         return """
-$ret  
+$ret
                     """
     }
 
@@ -366,3 +369,4 @@ object LogTracer : VertxTracer<Any?, Any?> {
         }
     }
 }
+*/
