@@ -17,7 +17,7 @@ interface DeleteReturning<Entity : Any, TB> where TB : Table<Entity, TB> {
 
 }
 
-interface PgAfterWhere<Entity : Any, TB> : Limit<Entity, TB>, Insert<Entity, TB>, Delete<Entity, TB>,
+interface PgAfterWhere<Entity : Any, TB> : OrderBy<Entity, TB>, Insert<Entity, TB>, Delete<Entity, TB>,
     Update<Entity, TB> , InsertReturning<Entity, TB>, DeleteReturning<Entity, TB>,
     UpdateReturning<Entity, TB> where TB : Table<Entity, TB>
 

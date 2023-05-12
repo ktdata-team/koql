@@ -109,12 +109,12 @@ open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val con
         return this
     }
 
-    override fun offset(i: Int): OrderBy<Entity, TB> {
+    override fun offset(i: Int): Select<Entity, TB> {
         this.offset = i
         return this
     }
 
-    override fun orderBy(order: OrderClause<Entity, TB>, vararg orders: OrderClause<Entity, TB>): Select<Entity, TB> {
+    override fun orderBy(order: OrderClause<Entity, TB>, vararg orders: OrderClause<Entity, TB>): Limit<Entity, TB> {
         this.orders.apply {
             add(order)
             addAll(orders)
@@ -137,18 +137,6 @@ open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val con
                     ""
                 }
             } ${
-                if (limit != null) {
-                    """ LIMIT $limit"""
-                } else {
-                    ""
-                }
-            } ${
-                if (offset != null) {
-                    """ OFFSET $offset"""
-                } else {
-                    ""
-                }
-            } ${
                 if (orders.isNotEmpty()) {
                     """ ORDER BY""" + orders.joinToString(",") {
                         """ $r${it.column.name}$r ${
@@ -162,7 +150,19 @@ open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val con
                 } else {
                     ""
                 }
-            }"""
+            } ${
+                if (limit != null) {
+                    """ LIMIT $limit"""
+                } else {
+                    ""
+                }
+            } ${
+                if (offset != null) {
+                    """ OFFSET $offset"""
+                } else {
+                    ""
+                }
+            } """
 
         return QuerySql(
             sql, paramMap, executor = config.executor, ret = table.entityKlz, resultMapper = mapper,
@@ -340,13 +340,13 @@ interface Dao<Entity : Any, TB> : Where<Entity, TB> where TB : Table<Entity, TB>
         vararg orders: OrderClause<Entity, TB>,
     ): PageSql<Entity> {
 
-        val base = where(condition).limit(pageable.pageSize).offset(pageable.pageSize * pageable.pageNumber).let {
+        val base = where(condition).let {
             if (order != null) {
                 it.orderBy(order , *orders)
             }else{
                 it
             }
-        }
+        }.limit(pageable.pageSize).offset(pageable.pageSize * pageable.pageNumber)
 
         return PageSql(
             contentSql = base.select(),
@@ -363,18 +363,19 @@ interface Select<Entity : Any, TB> where TB : Table<Entity, TB> {
     fun count(column: Column<*, Entity, TB>? = null): SingleQuerySql<Int>
 }
 
-interface OrderBy<Entity : Any, TB> : Select<Entity, TB> where TB : Table<Entity, TB> {
-    fun orderBy(order: OrderClause<Entity, TB>, vararg orders: OrderClause<Entity, TB>): Select<Entity, TB>
-}
 
-interface Offset<Entity : Any, TB> : OrderBy<Entity, TB> where TB : Table<Entity, TB> {
-    fun offset(i: Int): OrderBy<Entity, TB>
+
+interface Offset<Entity : Any, TB> : Select<Entity, TB> where TB : Table<Entity, TB> {
+    fun offset(i: Int): Select<Entity, TB>
 }
 
 interface Limit<Entity : Any, TB> : Offset<Entity, TB> where TB : Table<Entity, TB> {
     fun limit(i: Int): Offset<Entity, TB>
 }
 
+interface OrderBy<Entity : Any, TB> : Limit<Entity, TB> where TB : Table<Entity, TB> {
+    fun orderBy(order: OrderClause<Entity, TB>, vararg orders: OrderClause<Entity, TB>): Limit<Entity, TB>
+}
 interface Update<Entity : Any, TB> where TB : Table<Entity, TB> {
     fun update(entity: Entity): UpdateSql
     fun updateWithNull(entity: Entity): UpdateSql
@@ -390,7 +391,7 @@ interface Delete<Entity : Any, TB> where TB : Table<Entity, TB> {
 
 }
 
-interface AfterWhere<Entity : Any, TB> : Limit<Entity, TB>, Insert<Entity, TB>, Delete<Entity, TB>,
+interface AfterWhere<Entity : Any, TB> : OrderBy<Entity, TB>, Insert<Entity, TB>, Delete<Entity, TB>,
     Update<Entity, TB> where TB : Table<Entity, TB>
 
 interface Where<Entity : Any, TB> : AfterWhere<Entity, TB> where TB : Table<Entity, TB> {

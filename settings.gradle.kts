@@ -1,7 +1,7 @@
 pluginManagement {
     repositories {
         mavenLocal()
-        maven("https://maven.aliyun.com/nexus/content/groups/public/")
+//        maven("https://maven.aliyun.com/nexus/content/groups/public/")
         mavenCentral()
         maven("https://jitpack.io")
         maven("https://clojars.org/repo/")
