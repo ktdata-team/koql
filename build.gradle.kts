@@ -47,7 +47,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.github.ktdata-team.koql"
+            groupId = "com.github.ktdata-team"
             artifactId = "koql"
 
 
