@@ -1,9 +1,6 @@
 package sqltest
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.koql.base.Table
 import com.koql.pgsql.PgKoqlConfig
 import com.koql.vertxpoolexecutor.VertxSqlPoolExecutor
@@ -141,9 +138,6 @@ class SqlTest() {
         )
 
         DatabindCodec.mapper()
-            .registerModule(KotlinModule.Builder().build())
-            .registerModule(Jdk8Module())
-            .registerModule(JavaTimeModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
         val dsl = PgKoqlConfig(
