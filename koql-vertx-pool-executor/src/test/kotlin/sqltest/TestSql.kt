@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.koql.base.DefaultKoqlConfig
-import com.koql.base.JacksonResultMapper
 import com.koql.base.Table
 import com.koql.pgsql.PgKoqlConfig
 import com.koql.vertxpoolexecutor.VertxSqlPoolExecutor

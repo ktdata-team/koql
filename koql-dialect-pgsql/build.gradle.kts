@@ -1,10 +1,11 @@
 plugins {
     id("java")
     kotlin("jvm")
+    `maven-publish`
 }
 
 group = "com.koql"
-version = "0.2"
+version = rootProject.version
 
 repositories {
     mavenCentral()
@@ -36,4 +37,15 @@ tasks {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.koql"
+            artifactId = "koql-dialect-pgsql"
+
+            from(components["java"])
+        }
+    }
 }

@@ -1,6 +1,7 @@
 plugins {
     id("java")
     kotlin("jvm")
+    `maven-publish`
 }
 
 group = "com.koql"
@@ -20,9 +21,6 @@ dependencies {
     api(group = "io.vertx", name = "vertx-lang-kotlin", version = vertxVersion)
     api(group = "io.vertx", name = "vertx-lang-kotlin-coroutines", version = vertxVersion)
     api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     api(kotlin("stdlib", kotlinVersion))
     api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = kotlinCoroutineVersion)
     api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version = kotlinCoroutineVersion)
@@ -57,4 +55,15 @@ tasks {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.koql"
+            artifactId = "koql-vertx-pool-executor"
+
+            from(components["java"])
+        }
+    }
 }

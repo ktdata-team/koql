@@ -7,13 +7,13 @@ abstract class Table<Entity : Any, TB>(val name: String, val entityKlz: KClass<E
 //    : Where<Entity, TB> where TB : Table<Entity, TB>
 {
 
-    val columnMap: MutableMap<Column<Any?, Entity, TB>, KMutableProperty1<Entity, Any>> = mutableMapOf()
+    val columnMap: MutableMap<Column<Any?, Entity, TB>, KMutableProperty1<Entity, Any?>> = mutableMapOf()
     val resultNameMap: MutableMap<String, String> = mutableMapOf()
 
     //    val propMap: MutableMap<KMutableProperty1<Entity , Any> , Column<Any?, Entity, TB>> = mutableMapOf()
     @Suppress("UNCHECKED_CAST")
     protected fun <Type> addColumn(col: Column<*, Entity, TB>, prop: KMutableProperty1<Entity, Type>) {
-        columnMap.put(col as Column<Any?, Entity, TB>, prop as KMutableProperty1<Entity, Any>)
+        columnMap.put(col as Column<Any?, Entity, TB>, prop as KMutableProperty1<Entity, Any?>)
         resultNameMap.put(col.name, prop.name)
     }
 
@@ -21,11 +21,11 @@ abstract class Table<Entity : Any, TB>(val name: String, val entityKlz: KClass<E
     protected fun <Type> column(
         name: String,
         table: TB,
-        prop: KMutableProperty1<Entity, Type> ,
-        setMapper: ((Type?)->Any?)? = null,
-        getMapper: ((Any?)->Type?)? = null,
+        prop: KMutableProperty1<Entity, Type>,
+        setMapper: ((Type?) -> Any?)? = null,
+        getMapper: ((Any?) -> Type?)? = null,
     ): Column<Type, Entity, TB> {
-        return Column<Type, Entity, TB>(name, table , setMapper, getMapper).also { addColumn(it, prop) }
+        return Column<Type, Entity, TB>(name, table, setMapper, getMapper).also { addColumn(it, prop) }
     }
 }
 
@@ -58,7 +58,8 @@ open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val con
     override fun whereEntity(entity: Entity): Where<Entity, TB> {
 
         val condition = table.columnMap.mapValues {
-            it.value(entity)
+            val a = it.value.get(entity)
+            it.value.get(entity)
         }.filter {
             it.value != null
         }.map {
@@ -108,7 +109,7 @@ open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val con
         return this
     }
 
-    override fun offset(i: Int): Select<Entity, TB> {
+    override fun offset(i: Int): OrderBy<Entity, TB> {
         this.offset = i
         return this
     }
@@ -166,6 +167,55 @@ open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val con
         return QuerySql(
             sql, paramMap, executor = config.executor, ret = table.entityKlz, resultMapper = mapper,
             table = table
+        )
+    }
+
+    override fun count(column: Column<*, Entity, TB>?): SingleQuerySql<Int> {
+        val paramMap = mutableMapOf<String, Any?>()
+
+        val colName = column?.name?.let { """$r${it}$r""" } ?: "*"
+
+        config.context["keyGenerator"] = keyGenerator
+
+        val sql =
+            """SELECT count($colName) FROM $r${table.name}$r ${
+                if (condition != null) {
+                    val render = condition!!.render(config)
+                    paramMap.putAll(render.second)
+                    """ WHERE ${render.first}"""
+                } else {
+                    ""
+                }
+            } ${
+                if (limit != null) {
+                    """ LIMIT $limit"""
+                } else {
+                    ""
+                }
+            } ${
+                if (offset != null) {
+                    """ OFFSET $offset"""
+                } else {
+                    ""
+                }
+            } ${
+                if (orders.isNotEmpty()) {
+                    """ ORDER BY""" + orders.joinToString(",") {
+                        """ $r${it.column.name}$r ${
+                            if (it.order != null) {
+                                it.order.name
+                            } else {
+                                ""
+                            }
+                        } """
+                    }
+                } else {
+                    ""
+                }
+            }"""
+
+        return SingleQuerySql(
+            sql, paramMap, executor = config.executor, ret = Int::class, resultMapper = mapper,
         )
     }
 
@@ -278,10 +328,39 @@ open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val con
 }
 
 interface Dao<Entity : Any, TB> : Where<Entity, TB> where TB : Table<Entity, TB> {
+
+    fun findBy(condition: Condition<Entity, TB>): QuerySql<Entity> {
+        return this.where(condition).select()
+    }
+
+    fun findPagesBy(
+        condition: Condition<Entity, TB>,
+        pageable: Pageable<Entity, TB>,
+        order: OrderClause<Entity, TB>? = null,
+        vararg orders: OrderClause<Entity, TB>,
+    ): PageSql<Entity> {
+
+        val base = where(condition).limit(pageable.pageSize).offset(pageable.pageSize * pageable.pageNumber).let {
+            if (order != null) {
+                it.orderBy(order , *orders)
+            }else{
+                it
+            }
+        }
+
+        return PageSql(
+            contentSql = base.select(),
+            countSql = base.count(),
+            page = pageable
+        )
+    }
+
 }
 
 interface Select<Entity : Any, TB> where TB : Table<Entity, TB> {
     fun select(): QuerySql<Entity>
+
+    fun count(column: Column<*, Entity, TB>? = null): SingleQuerySql<Int>
 }
 
 interface OrderBy<Entity : Any, TB> : Select<Entity, TB> where TB : Table<Entity, TB> {
@@ -289,7 +368,7 @@ interface OrderBy<Entity : Any, TB> : Select<Entity, TB> where TB : Table<Entity
 }
 
 interface Offset<Entity : Any, TB> : OrderBy<Entity, TB> where TB : Table<Entity, TB> {
-    fun offset(i: Int): Select<Entity, TB>
+    fun offset(i: Int): OrderBy<Entity, TB>
 }
 
 interface Limit<Entity : Any, TB> : Offset<Entity, TB> where TB : Table<Entity, TB> {

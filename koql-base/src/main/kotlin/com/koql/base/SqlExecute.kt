@@ -2,20 +2,9 @@ package com.koql.base
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.vertx.core.Future
-import io.vertx.core.Vertx
-import io.vertx.core.json.JsonObject
-import io.vertx.kotlin.coroutines.await
-import io.vertx.sqlclient.Pool
-import io.vertx.sqlclient.SqlClient
-import io.vertx.sqlclient.SqlConnection
-import io.vertx.sqlclient.impl.Utils
-import io.vertx.sqlclient.templates.SqlTemplate
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.future.future
-import kotlinx.coroutines.runBlocking
+import java.util.*
 import java.util.concurrent.CompletableFuture
-import kotlin.coroutines.coroutineContext
+import java.util.function.Function
 import kotlin.reflect.KClass
 
 
@@ -60,6 +49,141 @@ open class JacksonResultMapper(val objectMapper: ObjectMapper) : ResultMapper {
         return objectMapper.convertValue(obj, object : TypeReference<List<T>>() {})
     }
 
+}
+
+
+interface Page<T> : List<T> {
+
+    val totalPages: Int
+    val totalElements: Int
+    val pageNumber: Int
+    val pageSize: Int
+    val offset: Int
+    val sort: String?
+    val order: String?
+}
+
+open class PageImpl<T>(
+    val content: List<T>,
+    override val totalPages: Int,
+    override val totalElements: Int,
+    override val pageNumber: Int,
+    override val pageSize: Int,
+    override val offset: Int,
+    override val sort: String? = null,
+    override val order: String? = null,
+) : Page<T>,
+    List<T> by content
+
+interface Pageable<Entity : Any, TB : Table<Entity, TB>> {
+
+    val pageNumber: Int
+
+    val pageSize: Int
+
+
+}
+
+open class PageableImpl<Entity : Any, TB : Table<Entity, TB>>(
+    override val pageNumber: Int,
+    override val pageSize: Int,
+
+    ) : Pageable<Entity, TB> {
+
+}
+
+open class PageSql<ResultType : Any>(
+    val contentSql: QuerySql<ResultType>,
+    val countSql: SingleQuerySql<Int>,
+    val page: Pageable<*, *>
+) {
+    fun fetchAll(): Page<ResultType> {
+        val content = contentSql.fetchAll()
+        val count = countSql.fetchOne()
+
+        return PageImpl(
+            content = content,
+            totalPages = count / page.pageSize,
+            totalElements = count,
+            pageNumber = page.pageNumber,
+            pageSize = page.pageSize,
+            offset = page.pageSize * page.pageNumber,
+        )
+    }
+
+    fun fetchAllAsync(): CompletableFuture<Page<ResultType>> {
+        val content = contentSql.fetchAllAsync()
+        val count = countSql.fetchOneAsync()
+
+        return content.thenCombine(count) { ct, c ->
+            PageImpl(
+                content = ct,
+                totalPages = c / page.pageSize,
+                totalElements = c,
+                pageNumber = page.pageNumber,
+                pageSize = page.pageSize,
+                offset = page.pageSize * page.pageNumber,
+            )
+        }
+
+    }
+
+    suspend fun fetchAllSuspend(): Page<ResultType> {
+        val content = contentSql.fetchAllSuspend()
+        val count = countSql.fetchOneSuspend()
+
+        return PageImpl(
+            content = content,
+            totalPages = count / page.pageSize,
+            totalElements = count,
+            pageNumber = page.pageNumber,
+            pageSize = page.pageSize,
+            offset = page.pageSize * page.pageNumber,
+        )
+    }
+}
+
+open class SingleQuerySql<ResultType : Any>(
+    sql: String,
+    params: Map<String, Any?>,
+    executor: Executor?,
+    ret: KClass<ResultType>,
+    val resultMapper: ResultMapper?,
+) : TemplateSql<ResultType>(
+    sql,
+    params,
+    SqlType.QUERY,
+    executor,
+    ret,
+) {
+    fun fetchOne(): ResultType {
+        return super.execute()
+            .first()
+            .firstNotNullOf { it.value }
+            .let {
+                resultMapper!!.convert(it, ret)
+            }
+    }
+
+    fun fetchOneAsync(): CompletableFuture<ResultType> {
+        return super.executeAsync()
+            .thenApply {
+                it.first()
+                    .firstNotNullOf { it.value }
+                    .let {
+                        resultMapper!!.convert(it, ret)
+                    }
+            }
+    }
+
+    suspend fun fetchOneSuspend(): ResultType {
+        return super.executeSuspend()
+            .first()
+            .firstNotNullOf { it.value }
+            .let {
+                resultMapper!!.convert(it, ret)
+            }
+    }
 }
 
 open class QuerySql<ResultType : Any>(
@@ -253,14 +377,14 @@ interface Executor {
     suspend fun txExecutorSuspend(): TxExecutor
 }
 
-interface TxExecutor : Tx , Executor{
+interface TxExecutor : Tx, Executor {
 
 }
 
 interface RawExecutor : Executor {
-    fun withTx(rawQueryStart: RawQueryStart,block : (TxQueryStart)->Unit)
-    fun withTxAsync(rawQueryStart: RawQueryStart,block : (TxQueryStart)->CompletableFuture<Unit>)
-    suspend fun withTxSuspend(rawQueryStart: RawQueryStart,block : suspend (TxQueryStart)->Unit)
+    fun withTx(rawQueryStart: RawQueryStart, block: (TxQueryStart) -> Unit)
+    fun withTxAsync(rawQueryStart: RawQueryStart, block: (TxQueryStart) -> CompletableFuture<Unit>)
+    suspend fun withTxSuspend(rawQueryStart: RawQueryStart, block: suspend (TxQueryStart) -> Unit)
 
 }
 
