@@ -120,42 +120,42 @@ private val log = KotlinLogging.logger { }
 class SqlTest() {
     @org.junit.jupiter.api.Test
     fun test() {
-        val vertx = Vertx.vertx(
-            VertxOptions()
-                .setTracingOptions(
-                    TracingOptions()
-                        .setFactory(
-                            LogTracerFactory()
-                                .apply {
-                                    addResolvers(
-                                        QueryRequestTraceTypeResolver(),
-                                        RowSetTraceTypeResolver(),
-                                        SqlResultImplTraceTypeResolver(),
-                                    )
-                                }
-                        )
-                )
-        )
-
-        DatabindCodec.mapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-        val dsl = PgKoqlConfig(
-            executor = VertxSqlPoolExecutor(
-                PgPool.pool(
-                    vertx,
-                    PgConnectOptions()
-                        .setHost("127.0.0.1")
-                        .setPort(5432)
-                        .setUser("ai_draw")
-                        .setDatabase("ai_draw")
-                        .setPassword("HeyDJWiiMuOOOhN")
-                        .setTracingPolicy(TracingPolicy.ALWAYS),
-                    PoolOptions()
-                )
-            ))
-
-            .start()
+//        val vertx = Vertx.vertx(
+//            VertxOptions()
+//                .setTracingOptions(
+//                    TracingOptions()
+//                        .setFactory(
+//                            LogTracerFactory()
+//                                .apply {
+//                                    addResolvers(
+//                                        QueryRequestTraceTypeResolver(),
+//                                        RowSetTraceTypeResolver(),
+//                                        SqlResultImplTraceTypeResolver(),
+//                                    )
+//                                }
+//                        )
+//                )
+//        )
+//
+//        DatabindCodec.mapper()
+//            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+//
+//        val dsl = PgKoqlConfig(
+//            executor = VertxSqlPoolExecutor(
+//                PgPool.pool(
+//                    vertx,
+//                    PgConnectOptions()
+//                        .setHost("127.0.0.1")
+//                        .setPort(5432)
+//                        .setUser("ai_draw")
+//                        .setDatabase("ai_draw")
+//                        .setPassword("HeyDJWiiMuOOOhN")
+//                        .setTracingPolicy(TracingPolicy.ALWAYS),
+//                    PoolOptions()
+//                )
+//            ))
+//
+//            .start()
 //        dsl.table(TEST)
 //            .where(
 //                TEST.typeInt2.eq(2).and(
@@ -173,37 +173,37 @@ class SqlTest() {
 //            .also {
 //                println(it)
 //            }
-
-        dsl.table(TEST)
-            .insertReturning(
-                Test0(
-                    typeBoolean = true,
-                    typeInt2 = 2,
-                    typeInt4 = 4,
-                    typeInt8 = 8,
-                    typeFloat4 = 4f,
-                    typeFloat8 = 8.0,
-                    typeChar = "a",
-                    typeVarchar = "aaa",
-                    typeText = "aaaaa",
-                    typeName = "aaa",
-                    typeUuid = UUID.randomUUID(),
-                    typeDate = LocalDate.now(),
-                    typeTime = LocalTime.now(),
-                    typeTimetz = OffsetTime.now(),
-                    typeTimestamp = LocalDateTime.now(),
-                    typeTimestamptz = OffsetDateTime.now(),
-                    typeInterval = Duration.ofDays(5),
-                    typeBytea = "aaa".toByteArray(),
-                    typeInet = InetAddress.getLocalHost(),
-                    typeVarcharArray = arrayOf("bbb")
-                )
-            ).fetchAll()
-            .also {
-                log.info { it }
-            }
-
-        Thread.sleep(5000)
+//
+//        dsl.table(TEST)
+//            .insertReturning(
+//                Test0(
+//                    typeBoolean = true,
+//                    typeInt2 = 2,
+//                    typeInt4 = 4,
+//                    typeInt8 = 8,
+//                    typeFloat4 = 4f,
+//                    typeFloat8 = 8.0,
+//                    typeChar = "a",
+//                    typeVarchar = "aaa",
+//                    typeText = "aaaaa",
+//                    typeName = "aaa",
+//                    typeUuid = UUID.randomUUID(),
+//                    typeDate = LocalDate.now(),
+//                    typeTime = LocalTime.now(),
+//                    typeTimetz = OffsetTime.now(),
+//                    typeTimestamp = LocalDateTime.now(),
+//                    typeTimestamptz = OffsetDateTime.now(),
+//                    typeInterval = Duration.ofDays(5),
+//                    typeBytea = "aaa".toByteArray(),
+//                    typeInet = InetAddress.getLocalHost(),
+//                    typeVarcharArray = arrayOf("bbb")
+//                )
+//            ).fetchAll()
+//            .also {
+//                log.info { it }
+//            }
+//
+//        Thread.sleep(5000)
 //        dsl.startTx().let {dsl1 ->
 //            dsl1.table(TEST)
 //                .where(
