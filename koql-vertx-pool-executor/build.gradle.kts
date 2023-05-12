@@ -60,7 +60,7 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.koql"
+            groupId = "com.github.ktdata-team.koql"
             artifactId = "koql-vertx-pool-executor"
 
             from(components["java"])
