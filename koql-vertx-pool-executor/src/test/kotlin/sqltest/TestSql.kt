@@ -1,9 +1,22 @@
 /*
 package sqltest
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.koql.base.JacksonResultMapper
 import com.koql.base.Table
+import com.koql.pgsql.PgKoqlConfig
+import com.koql.vertxpoolexecutor.VertxSqlPoolExecutor
+import io.vertx.core.Vertx
+import io.vertx.core.VertxOptions
+import io.vertx.core.json.jackson.DatabindCodec
+import io.vertx.core.tracing.TracingOptions
+import io.vertx.core.tracing.TracingPolicy
+import io.vertx.pgclient.PgConnectOptions
+import io.vertx.pgclient.PgPool
 import io.vertx.pgclient.data.Inet
 import io.vertx.pgclient.data.Interval
+import io.vertx.sqlclient.PoolOptions
 import io.vertx.sqlclient.data.Numeric
 import mu.KotlinLogging
 import java.math.BigDecimal
@@ -110,113 +123,117 @@ private val log = KotlinLogging.logger { }
 class SqlTest() {
     @org.junit.jupiter.api.Test
     fun test() {
-//        val vertx = Vertx.vertx(
-//            VertxOptions()
-//                .setTracingOptions(
-//                    TracingOptions()
-//                        .setFactory(
-//                            LogTracerFactory()
-//                                .apply {
-//                                    addResolvers(
-//                                        QueryRequestTraceTypeResolver(),
-//                                        RowSetTraceTypeResolver(),
-//                                        SqlResultImplTraceTypeResolver(),
-//                                    )
-//                                }
-//                        )
-//                )
-//        )
-//
-//        DatabindCodec.mapper()
-//            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-//
-//        val dsl = PgKoqlConfig(
-//            executor = VertxSqlPoolExecutor(
-//                PgPool.pool(
-//                    vertx,
-//                    PgConnectOptions()
-//                        .setHost("127.0.0.1")
-//                        .setPort(5432)
-//                        .setUser("ai_draw")
-//                        .setDatabase("ai_draw")
-//                        .setPassword("HeyDJWiiMuOOOhN")
-//                        .setTracingPolicy(TracingPolicy.ALWAYS),
-//                    PoolOptions()
-//                )
-//            ))
-//
-//            .start()
-//        dsl.table(TEST)
-//            .where(
-//                TEST.typeInt2.eq(2).and(
-//                    TEST.typeBoolean.eq(true)
-//                        .and(TEST.typeFloat4.eq(4f))
-//                ).and(TEST.typeInt4.eq(4))
-//            )
-//            .limit(1)
-//            .select()
-//            .also {
-//                println(it.sql)
-//                println(it.params)
-//            }
-//            .fetchOne()
-//            .also {
-//                println(it)
-//            }
-//
-//        dsl.table(TEST)
-//            .insertReturning(
-//                Test0(
-//                    typeBoolean = true,
-//                    typeInt2 = 2,
-//                    typeInt4 = 4,
-//                    typeInt8 = 8,
-//                    typeFloat4 = 4f,
-//                    typeFloat8 = 8.0,
-//                    typeChar = "a",
-//                    typeVarchar = "aaa",
-//                    typeText = "aaaaa",
-//                    typeName = "aaa",
-//                    typeUuid = UUID.randomUUID(),
-//                    typeDate = LocalDate.now(),
-//                    typeTime = LocalTime.now(),
-//                    typeTimetz = OffsetTime.now(),
-//                    typeTimestamp = LocalDateTime.now(),
-//                    typeTimestamptz = OffsetDateTime.now(),
-//                    typeInterval = Duration.ofDays(5),
-//                    typeBytea = "aaa".toByteArray(),
-//                    typeInet = InetAddress.getLocalHost(),
-//                    typeVarcharArray = arrayOf("bbb")
-//                )
-//            ).fetchAll()
-//            .also {
-//                log.info { it }
-//            }
-//
-//        Thread.sleep(5000)
-//        dsl.startTx().let {dsl1 ->
-//            dsl1.table(TEST)
-//                .where(
-//                    TEST.typeInt2.eq(2).and(
-//                        TEST.typeBoolean.eq(true)
-//                            .and(TEST.typeFloat4.eq(4f))
-//                    ).and(TEST.typeInt4.eq(4))
-//                )
-//                .select()
-//                .also {
-//                    println(it.sql)
-//                    println(it.params)
-//                }
-//                .fetchOne()
-//                .also {
-//                    println(it)
-//                }
-//            dsl1.commit()
-//        }
+        val vertx = Vertx.vertx(
+            VertxOptions()
+                .setTracingOptions(
+                    TracingOptions()
+                        .setFactory(
+                            LogTracerFactory()
+                                .apply {
+                                    addResolvers(
+                                        QueryRequestTraceTypeResolver(),
+                                        RowSetTraceTypeResolver(),
+                                        SqlResultImplTraceTypeResolver(),
+                                    )
+                                }
+                        )
+                )
+        )
 
-//        dsl.startTx().let {
-//            it.commit()
-//        }
+        DatabindCodec.mapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .registerModule(JavaTimeModule())
+
+        val url = "postgresql://127.0.0.1:5432/test"
+        val user = "test"
+        val pwd = "HeyDJWiiMuOOOhN"
+        val dsl = PgKoqlConfig(
+            executor = VertxSqlPoolExecutor(
+                PgPool.pool(
+                    vertx,
+                    PgConnectOptions.fromUri(url)
+                        .setUser(user)
+                        .setPassword(pwd)
+                        .setTracingPolicy(TracingPolicy.ALWAYS),
+                    PoolOptions()
+                )
+            ),
+            resultMapper = JacksonResultMapper(DatabindCodec.mapper())
+
+        )
+
+            .start()
+        dsl.table(TEST)
+            .where(
+                TEST.typeInt2.eq(2).and(
+                    TEST.typeBoolean.eq(true)
+                        .and(TEST.typeFloat4.eq(4f))
+                ).and(TEST.typeInt4.eq(4))
+            )
+            .limit(1)
+            .select()
+            .also {
+                println(it.sql)
+                println(it.params)
+            }
+            .fetchOne()
+            .also {
+                println(it)
+            }
+
+        dsl.table(TEST)
+            .insertReturning(
+                Test0(
+                    typeBoolean = true,
+                    typeInt2 = 2,
+                    typeInt4 = 4,
+                    typeInt8 = 8,
+                    typeFloat4 = 4f,
+                    typeFloat8 = 8.0,
+                    typeChar = "a",
+                    typeVarchar = "aaa",
+                    typeText = "aaaaa",
+                    typeName = "aaa",
+                    typeUuid = UUID.randomUUID(),
+                    typeDate = LocalDate.now(),
+                    typeTime = LocalTime.now(),
+                    typeTimetz = OffsetTime.now(),
+                    typeTimestamp = LocalDateTime.now(),
+                    typeTimestamptz = OffsetDateTime.now(),
+                    typeInterval = Duration.ofDays(5),
+                    typeBytea = "aaa".toByteArray(),
+                    typeInet = InetAddress.getLocalHost(),
+                    typeVarcharArray = arrayOf("bbb")
+                )
+            ).fetchAll()
+            .also {
+                log.info { it }
+            }
+
+        Thread.sleep(5000)
+        dsl.startTx().let {dsl1 ->
+            dsl1.table(TEST)
+                .where(
+                    TEST.typeInt2.eq(2).and(
+                        TEST.typeBoolean.eq(true)
+                            .and(TEST.typeFloat4.eq(4f))
+                    ).and(TEST.typeInt4.eq(4))
+                )
+                .select()
+                .also {
+                    println(it.sql)
+                    println(it.params)
+                }
+                .fetchOne()
+                .also {
+                    println(it)
+                }
+            dsl1.commit()
+        }
+
+        dsl.startTx().let {
+            it.commit()
+        }
 
     }
 }

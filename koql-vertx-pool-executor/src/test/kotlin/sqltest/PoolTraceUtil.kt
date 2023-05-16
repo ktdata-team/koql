@@ -61,8 +61,7 @@ open class DefaultLogTracerFactory : LogTracerFactory() {
 
         val facs = ServiceHelper.loadFactories(TraceTypeResolver::class.java)
         addResolvers(*facs.toTypedArray())
-*/
-/*        addResolvers(
+        addResolvers(
             object : TraceTypeResolver<QueryRequest> {
                 override fun getClass(): KClass<QueryRequest> {
                     return QueryRequest::class
@@ -123,7 +122,7 @@ $ret
                 }
 
             }
-        )*//*
+        )
 
     }
 }

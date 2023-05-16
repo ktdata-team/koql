@@ -43,7 +43,7 @@ class ParamKeyGenerator : KeyGenerator {
     }
 }
 
-open class DaoImpl<Entity : Any, TB, Q : QueryStart>(open val table: TB, val config: KoqlConfig<Q>) :
+open class DaoImpl<Entity : Any, TB, Q : QueryStart<Q>>(open val table: TB, val config: KoqlConfig<Q>) :
     Dao<Entity, TB> where TB : Table<Entity, TB> {
 
     var condition: Condition<Entity, TB>? = null

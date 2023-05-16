@@ -382,9 +382,9 @@ interface TxExecutor : Tx, Executor {
 }
 
 interface RawExecutor : Executor {
-    fun withTx(rawQueryStart: RawQueryStart, block: (TxQueryStart) -> Unit)
-    fun withTxAsync(rawQueryStart: RawQueryStart, block: (TxQueryStart) -> CompletableFuture<Unit>)
-    suspend fun withTxSuspend(rawQueryStart: RawQueryStart, block: suspend (TxQueryStart) -> Unit)
+    fun <T:RawQueryStart<T,Tx ,C> , Tx : TxQueryStart<Tx,C> , C: KoqlConfig<T>> withTx(rawQueryStart: RawQueryStart<T , Tx,C>, block: (Tx) -> Unit)
+    fun <T:RawQueryStart<T,Tx,C> , Tx : TxQueryStart<Tx,C>, C: KoqlConfig<T>> withTxAsync(rawQueryStart: RawQueryStart<T , Tx,C>, block: (Tx) -> CompletableFuture<Unit>)
+    suspend fun <T:RawQueryStart<T,Tx,C> , Tx : TxQueryStart<Tx,C> ,  C: KoqlConfig<T>>  withTxSuspend(rawQueryStart: RawQueryStart<T , Tx,C>, block: suspend (Tx) -> Unit)
 
 }
 

@@ -94,7 +94,11 @@ suspend inline fun <T> Pool.tx(crossinline block: suspend (SqlConnection) -> T?)
 open class VertxSqlPoolExecutor(
     val pool: Pool
 ) : VertxSqlClientExecutor(pool) , RawExecutor {
-    override fun withTx(rawQueryStart: RawQueryStart, block: (TxQueryStart) -> Unit) {
+
+    override fun <T : RawQueryStart<T, Tx, C>, Tx : TxQueryStart<Tx, C>, C : KoqlConfig<T>> withTx(
+        rawQueryStart: RawQueryStart<T, Tx, C>,
+        block: (Tx) -> Unit
+    ) {
         pool.withTransaction {cnn ->
             val ctx = Vertx.currentContext()
             val e =  VertxTxExecutor(cnn)
@@ -105,7 +109,10 @@ open class VertxSqlPoolExecutor(
         }
     }
 
-    override fun withTxAsync(rawQueryStart: RawQueryStart,block: (TxQueryStart) -> CompletableFuture<Unit>) {
+    override fun <T : RawQueryStart<T, Tx, C>, Tx : TxQueryStart<Tx, C>, C : KoqlConfig<T>> withTxAsync(
+        rawQueryStart: RawQueryStart<T, Tx, C>,
+        block: (Tx) -> CompletableFuture<Unit>
+    ) {
         pool.withTransaction {cnn ->
             val ctx = Vertx.currentContext()
             val e =  VertxTxExecutor(cnn)
@@ -114,13 +121,15 @@ open class VertxSqlPoolExecutor(
         }
     }
 
-    override suspend fun withTxSuspend(rawQueryStart: RawQueryStart,block: suspend (TxQueryStart) -> Unit) {
+    override suspend fun <T : RawQueryStart<T, Tx, C>, Tx : TxQueryStart<Tx, C>, C : KoqlConfig<T>> withTxSuspend(
+        rawQueryStart: RawQueryStart<T, Tx, C>,
+        block: suspend (Tx) -> Unit
+    ) {
         pool.tx { cnn ->
             val e =  VertxTxExecutor(cnn)
             val c = rawQueryStart.toTxQueryStart(mapOf("executor" to e))
             block(c)
         }
-
     }
 
     override fun txExecutor(): TxExecutor {
