@@ -372,6 +372,26 @@ interface Executor {
         type: SqlType = SqlType.QUERY
     ): CompletableFuture<List<Map<String, Any?>>>
 
+
+    fun executeBatch(
+        sql: String,
+        params:List< Map<String, Any?>>,
+        type: SqlType = SqlType.QUERY
+    ): List<Map<String, Any?>>
+
+    suspend fun executeBatchSuspend(
+        sql: String,
+        params:List< Map<String, Any?>>,
+        type: SqlType = SqlType.QUERY
+    ): List<Map<String, Any?>>
+
+    fun executeBatchAsync(
+        sql: String,
+        params: List<Map<String, Any?>>,
+        type: SqlType = SqlType.QUERY
+    ): CompletableFuture<List<Map<String, Any?>>>
+
+
     fun txExecutor(): TxExecutor
     fun txExecutorAsync(): CompletableFuture<TxExecutor>
     suspend fun txExecutorSuspend(): TxExecutor

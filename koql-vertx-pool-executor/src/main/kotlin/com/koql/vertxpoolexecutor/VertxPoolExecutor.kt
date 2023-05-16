@@ -181,6 +181,67 @@ abstract class VertxSqlClientExecutor(
     }
 
 
+
+    override fun executeBatch(
+        sql: String,
+        params:List< Map<String, Any?>>,
+        type: SqlType
+    ): List<Map<String, Any?>>{
+        return runBlocking { executeBatchSuspend(sql, params, type) }
+    }
+
+    override  suspend fun executeBatchSuspend(
+        sql: String,
+        params:List< Map<String, Any?>>,
+        type: SqlType
+    ): List<Map<String, Any?>>{
+        return executeBatch0(sql, params, type).await()
+    }
+
+    override fun executeBatchAsync(
+        sql: String,
+        params: List<Map<String, Any?>>,
+        type: SqlType
+    ): CompletableFuture<List<Map<String, Any?>>>{
+        return executeBatch0(sql, params, type).toCompletionStage().toCompletableFuture()
+    }
+
+
+
+    fun executeBatch0(
+        sql: String,
+        params: List<Map<String, Any?>>,
+        type: SqlType = SqlType.QUERY
+    ): Future<List<Map<String, Any?>>> {
+        return when (type) {
+            SqlType.QUERY -> {
+                SqlTemplate.forQuery(sqlClient, sql)
+                    .executeBatch(params)
+                    .map {
+                        it.map {
+                            val map = mutableMapOf<String , Any?>()
+                            val size: Int = it.size()
+                            for (pos in 0 until size) {
+                                val name: String = it.getColumnName(pos)
+                                val value: Any? = it.getValue(pos)
+                                map.put(name, value)
+                            }
+                            map
+                        }
+                    }
+            }
+
+            SqlType.UPDATE -> {
+                SqlTemplate.forUpdate(sqlClient, sql)
+                    .executeBatch(params)
+                    .map {
+                        listOf(mapOf<String, Int>("rowCount" to it.rowCount()))
+                    }
+            }
+        }
+
+    }
+
     fun execute0(
         sql: String,
         params: Map<String, Any?>,
